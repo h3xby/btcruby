@@ -10,7 +10,7 @@ module BTC
     if FFI::Platform.windows?
       ffi_lib 'libeay32', 'ssleay32'
     else
-      ffi_lib ['libssl.so.1.0.0', 'libssl.so.10', 'ssl']
+      ffi_lib ['libssl.so.1.0.2', 'libssl.so.1.0.0', 'libssl.so.10', 'ssl']
     end
 
     NID_secp256k1 = 714
@@ -347,7 +347,7 @@ module BTC
     def ecdsa_normalized_signature(signature)
       ecdsa_reserialize_signature(signature, normalize_s: true)
     end
-    
+
     def ecdsa_reserialize_signature(signature, normalize_s: false)
       raise ArgumentError, "Signature is missing" if !signature
 
@@ -368,7 +368,7 @@ module BTC
         end
 
         sig = ECDSA_SIG.new(psig) # read sig from its pointer
-        
+
         if normalize_s
           # Enforce low S values, by negating the value (modulo the order) if above order/2.
           s = sig[:s]
@@ -401,7 +401,7 @@ module BTC
       raise ArgumentError, "Signature is missing" if !signature
       raise ArgumentError, "Hash is missing" if !hash
       raise ArgumentError, "Public key is missing" if !public_key
-      
+
       # New versions of OpenSSL will reject non-canonical DER signatures. de/re-serialize first.
       signature = ecdsa_reserialize_signature(signature, normalize_s: false)
 
